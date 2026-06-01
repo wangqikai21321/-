@@ -34,6 +34,18 @@ def activation_value(tensor: torch.Tensor, channel: int | None = None, row: int 
     raise ValueError(f"Unsupported activation tensor shape: {tuple(tensor.shape)}")
 
 
+def activation_values(tensor: torch.Tensor, channel: int | None = None, row: int | None = None, col: int | None = None, unit: int | None = None) -> np.ndarray:
+    if tensor.ndim == 4:
+        c = 0 if channel is None else channel
+        h = tensor.shape[2] // 2 if row is None else row
+        w = tensor.shape[3] // 2 if col is None else col
+        return tensor[:, c, h, w].detach().cpu().numpy().astype(float)
+    if tensor.ndim == 2:
+        u = 0 if unit is None else unit
+        return tensor[:, u].detach().cpu().numpy().astype(float)
+    raise ValueError(f"Unsupported activation tensor shape: {tuple(tensor.shape)}")
+
+
 def scan_top_activations(
     dataset: VOCDataset,
     proposals: dict[str, np.ndarray],
@@ -56,12 +68,15 @@ def scan_top_activations(
         img = cv2.imread(str(item.image_path), cv2.IMREAD_COLOR)
         if img is None:
             continue
-        for box in proposals.get(item.image_id, np.empty((0, 4), dtype=np.float32)):
-            x = preprocess_region(img, tuple(box), size=image_size).unsqueeze(0).to(device)
+        boxes = proposals.get(item.image_id, np.empty((0, 4), dtype=np.float32))
+        for start in range(0, len(boxes), 64):
+            batch_boxes = boxes[start : start + 64]
+            x = torch.stack([preprocess_region(img, tuple(box), size=image_size) for box in batch_boxes]).to(device)
             with torch.no_grad():
                 act = model.extract(x, layer)[layer].cpu()
-            value = activation_value(act, channel=channel, row=row, col=col, unit=unit)
-            hits.append(ActivationHit(item.image_id, str(item.image_path), tuple(float(v) for v in box), value))
+            values = activation_values(act, channel=channel, row=row, col=col, unit=unit)
+            for box, value in zip(batch_boxes, values):
+                hits.append(ActivationHit(item.image_id, str(item.image_path), tuple(float(v) for v in box), float(value)))
             hits = sorted(hits, key=lambda h: h.activation, reverse=True)[:top_k]
     return hits
 

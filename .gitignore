@@ -1,0 +1,35 @@
+# Python/cache artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# IDE/project metadata
+.idea/
+.vscode/
+
+# Logs and temporary run output
+*.log
+*.err
+*.err.log
+
+# Dataset archives and local datasets
+rcnn_voc_system/data/
+*.tar
+*.zip
+1311.2524v5.pdf
+
+# Local notes and experiments that are intentionally not published
+R-CNN精读.md
+rcnn_steel_detection/
+assets/
+tools/
+
+# Training outputs, checkpoints, proposal caches, and feature caches
+rcnn_voc_system/outputs*/
+*.pt
+*.pth
+*.pkl
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
