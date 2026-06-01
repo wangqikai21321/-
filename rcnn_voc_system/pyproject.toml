@@ -1,0 +1,19 @@
+[project]
+name = "rcnn-voc-system"
+version = "0.1.0"
+description = "Original R-CNN style Pascal VOC reproduction with neuron visualization."
+requires-python = ">=3.10"
+dependencies = [
+  "torch>=2.0",
+  "torchvision>=0.15",
+  "opencv-contrib-python>=4.8",
+  "numpy>=1.24",
+  "matplotlib>=3.7",
+  "Pillow>=10.0",
+  "PyYAML>=6.0",
+  "streamlit>=1.30",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

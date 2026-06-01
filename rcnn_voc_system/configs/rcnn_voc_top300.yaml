@@ -1,0 +1,50 @@
+dataset:
+  year: "2012"
+  image_set_train: "trainval"
+  image_set_eval: "val"
+  voc_root: ""
+
+outputs:
+  root: "outputs_top300"
+
+model:
+  image_size: 227
+  pretrained: true
+  feature_layer: "fc7"
+  bbox_feature_layer: "fc7"
+
+proposals:
+  method: "selective_search"
+  mode: "fast"
+  top_k: 300
+  min_size: 16
+
+training:
+  batch_size: 128
+  epochs: 20
+  learning_rate: 0.0001
+  momentum: 0.9
+  weight_decay: 0.0005
+  log_interval: 100
+  grad_clip_norm: 10.0
+  positive_iou: 0.5
+  negative_iou: 0.5
+  svm_negative_iou: 0.3
+  bbox_iou: 0.6
+  hard_negative_iterations: 1
+  svm_c: 0.001
+  max_regions_per_image: 128
+  svm_negatives_per_image_per_class: 1
+  max_svm_positives_per_class: 2000
+  max_svm_negatives_per_class: 2000
+  seed: 42
+
+detection:
+  score_threshold: 0.0
+  nms_iou: 0.3
+  max_detections_per_class: 100
+
+visualization:
+  default_split: "val"
+  top_k: 16
+  max_images: 200
